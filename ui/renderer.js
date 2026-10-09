@@ -46,8 +46,10 @@ function renderProjects() {
   for (const p of shown) {
     const li = document.createElement('li');
     if (p.path === current) li.classList.add('current');
-    const open = tabs.filter(t => t.project.path === p.path).length;
-    li.innerHTML = `<span class="name"></span>${open ? `<span class="count">${open}</span>` : ''}<button class="add" title="New Claude tab here">+</button>`;
+    const mine = tabs.filter(t => t.project.path === p.path);
+    const open = mine.length;
+    const state = ['done', 'working'].find(s => mine.some(t => t.state === s));
+    li.innerHTML = `<span class="name"></span>${state ? `<span class="dot ${state}" title="${state === 'done' ? 'Claude finished' : 'Claude is working'}"></span>` : ''}${open ? `<span class="count">${open}</span>` : ''}<button class="add" title="New Claude tab here">+</button>`;
     li.querySelector('.name').textContent = p.name;
     li.title = p.path;
     li.onclick = () => openProject(p);
@@ -225,6 +227,7 @@ function setState(t, state) {
   t.state = state;
   t.tabEl.classList.toggle('working', state === 'working');
   t.tabEl.classList.toggle('done', state === 'done');
+  renderProjects();
 }
 window.deck.onClaudeEvent((id, event) => {
   const t = tabs.find(x => x.id === id);

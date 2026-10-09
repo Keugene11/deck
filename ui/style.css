@@ -10,6 +10,9 @@
   --accent: #0078d4;
   --hover: #2a2d2e;
   --selected: #37373d;
+  --working: #ffb000;
+  --done: #2f81f7;
+  --done-bg: #1c2b44;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg);
@@ -42,6 +45,11 @@ body.side-hidden #sidebar { display: none; }
   padding: 0 6px; line-height: 16px; }
 #projects li .add { visibility: hidden; width: 20px; height: 20px; border-radius: 3px; font-size: 15px; line-height: 1; }
 #projects li:hover .add { visibility: visible; }
+#projects li .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; box-sizing: border-box; }
+#projects li .dot.working { border: 2px solid var(--working); border-right-color: transparent; animation: spin .8s linear infinite; }
+#projects li .dot.done { width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; background: var(--done); }
+#projects li .dot.done::after { content: ''; width: 3px; height: 6px; margin-top: -2px;
+  border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
 #projects li.create .name { color: var(--fg-dim); font-style: italic; }
 
 #editor { flex: 1; display: flex; flex-direction: column; min-width: 0; }
@@ -54,11 +62,18 @@ body.side-hidden #sidebar { display: none; }
   border-top: 1px solid transparent; cursor: pointer; white-space: nowrap; }
 .tab.active { background: var(--tab-active); color: #fff; border-top-color: var(--accent); }
 .tab .label { flex: 1; }
-.tab .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; display: none; }
-.tab.working .dot { display: block; background: #3794ff; animation: pulse 1s ease-in-out infinite; }
-.tab.done .dot { display: block; background: #4ec97b; box-shadow: 0 0 6px #4ec97b; }
-.tab.done .label { color: #fff; }
-@keyframes pulse { 50% { opacity: .25; } }
+/* Status marks differ in colour (amber vs blue, safe for red-green colour blindness),
+   shape (spinning ring vs check badge) and motion, so any one of them is enough. */
+.tab .dot { width: 14px; height: 14px; border-radius: 50%; flex: none; display: none; box-sizing: border-box; }
+.tab.working { box-shadow: inset 0 -2px 0 var(--working); }
+.tab.working .dot { display: block; border: 2.5px solid var(--working); border-right-color: transparent;
+  animation: spin .8s linear infinite; }
+.tab.done { background: var(--done-bg); box-shadow: inset 0 -2px 0 var(--done); }
+.tab.done .dot { display: flex; align-items: center; justify-content: center; background: var(--done); }
+.tab.done .dot::after { content: ''; width: 3px; height: 6px; margin-top: -2px;
+  border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.tab.done .label { color: #fff; font-weight: 600; }
+@keyframes spin { to { transform: rotate(360deg); } }
 .tab .kind { font-size: 11px; color: #7a7a7a; }
 .tab .close { width: 20px; height: 20px; border-radius: 4px; visibility: hidden; font-size: 14px; line-height: 1; }
 .tab.active .close, .tab:hover .close { visibility: visible; }
