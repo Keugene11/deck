@@ -141,7 +141,18 @@ app.on('quit', () => {
   }
 });
 
+// Terminals started at the same instant fail on Windows (all but the first exit -1
+// with no output), so restoring several tabs at once queues them a little apart.
+const SPAWN_GAP = 400;
+let spawnQueue = Promise.resolve();
+const nextSpawnSlot = () => {
+  const slot = spawnQueue;
+  spawnQueue = slot.then(() => new Promise(r => setTimeout(r, SPAWN_GAP)));
+  return slot;
+};
+
 ipcMain.handle('pty:spawn', async (_e, { id, cwd, cols, rows, kind }) => {
+  await nextSpawnSlot();
   const [file, args] = kind === 'shell'
     ? [SHELL, ['-NoLogo']]
     : [CLAUDE, ['--dangerously-skip-permissions', '--settings', await hookSettings(id)]];

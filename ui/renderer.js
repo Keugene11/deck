@@ -21,6 +21,7 @@ let activeId = null;
 let fontSize = store.get('fontSize', 14);
 const lastUsed = store.get('lastUsed', {});   // project path -> timestamp
 let nextId = 1;
+const START_TABS = 3;
 
 // ---------- projects ----------
 
@@ -156,7 +157,7 @@ async function newTab(project, kind = 'claude', focus = true) {
 
   lastUsed[project.path] = Date.now();
   store.set('lastUsed', lastUsed);
-  if (focus || !activeId) activate(id);
+  if (focus || !activeId) activate(id); else renderProjects();
   safeFit(tab);
   await window.deck.spawn({ id, cwd: project.path, cols: term.cols, rows: term.rows, kind });
   saveSession();
@@ -299,5 +300,8 @@ window.addEventListener('focus', loadProjects);
     const p = projects.find(x => x.path === s.path);
     if (p) { await newTab(p, s.kind, first); first = false; }
   }
+  // Nothing to restore: open the project used last with a few Claude tabs.
+  const last = sortedProjects()[0];
+  if (!tabs.length && last) for (let i = 0; i < START_TABS; i++) await newTab(last, 'claude', i === 0);
   if (!tabs.length) $('#search').focus();
 })();
