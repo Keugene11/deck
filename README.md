@@ -2,6 +2,8 @@
 
 A desktop app for running many Claude Code sessions at once. Your projects are listed on the left, and each project's terminal tabs run across the top, like an editor whose every tab is Claude.
 
+![Deck with four Claude Code tabs open, one mid-task](screenshot.png)
+
 - **Projects on the left**: every folder in `~/projects`, most recently used first. Type in the search box to filter, or type a new name and press Enter to create the folder (`git init` included). Folders opened from anywhere else with Open Folder stay on the list too.
 - **Claude tabs on top**: clicking a project opens a tab running `claude --dangerously-skip-permissions` in that folder. Open as many as you want per project; the sidebar shows how many are open in each one.
 - **PowerShell tabs** sit beside them, for when you want a shell in the same folder.
