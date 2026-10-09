@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'">
+  <title>Deck</title>
+  <link rel="stylesheet" href="../node_modules/@xterm/xterm/css/xterm.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="titlebar"><span class="app-name">Deck</span><span id="title-path"></span></div>
+  <div id="main">
+    <aside id="sidebar">
+      <div class="side-head">
+        <span>PROJECTS</span>
+        <button id="new-project" title="Open Folder… (Ctrl+Shift+O)">+</button>
+      </div>
+      <input id="search" placeholder="Search or type a new name…" spellcheck="false">
+      <ul id="projects"></ul>
+    </aside>
+    <section id="editor">
+      <div id="tabbar">
+        <button id="toggle-side" title="Show/hide projects (Ctrl+Shift+B)">☰</button>
+        <div id="tabs"></div>
+        <button id="new-tab" title="New Claude tab in this project (Ctrl+Shift+T)">+</button>
+        <button id="new-shell" title="New PowerShell tab in this project (Ctrl+Shift+`)">&gt;_</button>
+      </div>
+      <div id="terminals">
+        <div id="empty">
+          <div class="big">Pick a project on the left</div>
+          <div>Each tab starts Claude with permissions skipped.</div>
+          <table>
+            <tr><td>Ctrl+Shift+T</td><td>New Claude tab, same project</td></tr>
+            <tr><td>Ctrl+Shift+`</td><td>New PowerShell tab, same project</td></tr>
+            <tr><td>Ctrl+Shift+W</td><td>Close tab</td></tr>
+            <tr><td>Ctrl+Tab</td><td>Next tab</td></tr>
+            <tr><td>Ctrl+1…9</td><td>Go to tab</td></tr>
+            <tr><td>Ctrl+Shift+O</td><td>Open Folder (Windows picker)</td></tr>
+            <tr><td>Ctrl+Shift+P</td><td>Search projects</td></tr>
+            <tr><td>Ctrl+Shift+B</td><td>Show/hide projects</td></tr>
+            <tr><td>Ctrl+= / Ctrl+-</td><td>Font size</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script src="../node_modules/@xterm/xterm/lib/xterm.js"></script>
+  <script src="../node_modules/@xterm/addon-fit/lib/addon-fit.js"></script>
+  <script src="renderer.js"></script>
+</body>
+</html>

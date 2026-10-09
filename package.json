@@ -1,0 +1,24 @@
+{
+  "name": "deck",
+  "version": "1.0.0",
+  "description": "Projects on the left, Claude tabs on top",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-packager . Deck --platform=win32 --arch=x64 --icon=build/icon.ico --out=dist --overwrite --no-asar --ignore=^/dist --app-copyright=keugene --win32metadata.FileDescription=Deck --win32metadata.ProductName=Deck",
+    "release": "npm run pack && node scripts/install.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@electron/packager": "^20.3.0",
+    "electron": "^44.7.0"
+  },
+  "dependencies": {
+    "@lydell/node-pty": "^1.2.0-beta.15",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0"
+  },
+  "productName": "Deck"
+}
