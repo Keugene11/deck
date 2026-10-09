@@ -11,6 +11,9 @@ const crypto = require('crypto');
 const PROJECTS = path.join(os.homedir(), 'projects');
 const CLAUDE = [path.join(os.homedir(), '.local', 'bin', 'claude.exe')].find(fs.existsSync) || 'claude';
 const SHELL = 'powershell.exe';
+// Several Claude tabs usually share one project folder, so each is told how to commit, push and deploy without
+// taking the others' half-finished edits with it (see parallel.md).
+const PARALLEL_RULES = path.join(__dirname, 'parallel.md');
 
 if (!process.env.DECK_SHOT && !app.requestSingleInstanceLock()) app.quit();
 
@@ -155,7 +158,7 @@ ipcMain.handle('pty:spawn', async (_e, { id, cwd, cols, rows, kind }) => {
   await nextSpawnSlot();
   const [file, args] = kind === 'shell'
     ? [SHELL, ['-NoLogo']]
-    : [CLAUDE, ['--dangerously-skip-permissions', '--settings', await hookSettings(id)]];
+    : [CLAUDE, ['--dangerously-skip-permissions', '--settings', await hookSettings(id), '--append-system-prompt-file', PARALLEL_RULES]];
   const p = pty.spawn(file, args, {
     name: 'xterm-256color',
     cwd,
