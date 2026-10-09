@@ -47,7 +47,7 @@ if (process.env.DECK_SHOT) {
     await wait(1500);
     const name = JSON.stringify(process.env.DECK_PROJECT || '');
     await win.webContents.executeJavaScript(`(projects.find(p => p.name === ${name}) ? openProject(projects.find(p => p.name === ${name})) : document.querySelector('#projects li').click())`);
-    await wait(9000);
+    await wait(Number(process.env.DECK_PRE || 9000));
     await win.webContents.executeJavaScript(`window.__ev = []; window.deck.onClaudeEvent((id, e) => window.__ev.push(e + '@' + Math.round(performance.now()))); 0`);
     if (process.env.DECK_TYPE) {
       await win.webContents.executeJavaScript(`window.deck.write(activeId, ${JSON.stringify(process.env.DECK_TYPE)})`);

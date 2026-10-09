@@ -17,6 +17,7 @@ const startMenu = path.join(process.env.APPDATA, 'Microsoft', 'Windows', 'Start 
 const ps = [desktop, startMenu].map(dir => `
 $s = (New-Object -ComObject WScript.Shell).CreateShortcut('${path.join(dir, 'Deck.lnk')}')
 $s.TargetPath = '${exe}'
+$s.Arguments = ''
 $s.WorkingDirectory = '${dest}'
 $s.IconLocation = '${exe},0'
 $s.Description = 'Claude tabs per project'
