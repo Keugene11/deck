@@ -59,6 +59,10 @@ if (process.env.DECK_SHOT) {
       await wait(Number(process.env.DECK_WAIT || 15000));
       console.log('DECK_EVENTS', await win.webContents.executeJavaScript(`JSON.stringify({ events: window.__ev, tab: document.querySelector('.tab').className })`));
     }
+    if (process.env.DECK_JS) {
+      console.log('DECK_JS', await win.webContents.executeJavaScript(process.env.DECK_JS));
+      await wait(Number(process.env.DECK_JSWAIT || 1500));
+    }
     fs.writeFileSync(process.env.DECK_SHOT, (await win.webContents.capturePage()).toPNG());
     app.quit();
   });
@@ -100,6 +104,75 @@ ipcMain.handle('projects:pick', async () => {
   if (r.canceled || !r.filePaths[0]) return null;
   const full = r.filePaths[0];
   return { name: path.basename(full) || full, path: full, mtime: Date.now() };
+});
+
+// ---------- files (the viewer/editor tabs, quick open, file tree) ----------
+
+// Folders nobody wants to browse or search: dependencies, build output, VCS internals.
+const SKIP_DIRS = new Set(['node_modules', '.git', '.next', '.turbo', '.vercel', 'dist', 'build', '__pycache__', '.cache', 'coverage', '.venv', 'venv', 'target']);
+const IMAGE_TYPES = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.bmp': 'image/bmp' };
+const MAX_TEXT = 3 * 1024 * 1024;
+
+// Every file under a project (relative, forward slashes) for quick open.
+ipcMain.handle('files:list', async (_e, root) => {
+  const out = [];
+  const walk = async (dir, depth) => {
+    if (out.length >= 30000 || depth > 10) return;
+    let entries;
+    try { entries = await fs.promises.readdir(dir, { withFileTypes: true }); } catch { return; }
+    for (const d of entries) {
+      if (d.isDirectory()) {
+        if (!SKIP_DIRS.has(d.name)) await walk(path.join(dir, d.name), depth + 1);
+      } else if (d.isFile()) out.push(path.relative(root, path.join(dir, d.name)).split(path.sep).join('/'));
+    }
+  };
+  await walk(root, 0);
+  return out;
+});
+
+// One folder's children for the tree: folders first, then files, each A to Z.
+ipcMain.handle('files:dir', async (_e, dir) => {
+  try {
+    const entries = await fs.promises.readdir(dir, { withFileTypes: true });
+    return entries
+      .filter(d => (d.isDirectory() && !SKIP_DIRS.has(d.name)) || d.isFile())
+      .map(d => ({ name: d.name, path: path.join(dir, d.name), dir: d.isDirectory() }))
+      .sort((a, b) => (b.dir - a.dir) || a.name.localeCompare(b.name, undefined, { sensitivity: 'base', numeric: true }));
+  } catch { return []; }
+});
+
+// A path as typed in terminal output (relative to the tab's folder, or absolute) -> the real file, or null.
+ipcMain.handle('files:resolve', (_e, cwd, candidate) => {
+  try {
+    const full = path.resolve(cwd, String(candidate).replace(/^file:[/][/][/]?/, ''));
+    return fs.statSync(full).isFile() ? full : null;
+  } catch { return null; }
+});
+
+ipcMain.handle('files:read', async (_e, file) => {
+  try {
+    const st = await fs.promises.stat(file);
+    const ext = path.extname(file).toLowerCase();
+    if (IMAGE_TYPES[ext] && st.size < 20 * 1024 * 1024) {
+      const buf = await fs.promises.readFile(file);
+      return { mtime: st.mtimeMs, size: st.size, image: `data:${IMAGE_TYPES[ext]};base64,${buf.toString('base64')}` };
+    }
+    if (st.size > MAX_TEXT) return { mtime: st.mtimeMs, size: st.size, tooBig: true };
+    const buf = await fs.promises.readFile(file);
+    if (buf.subarray(0, 8000).includes(0)) return { mtime: st.mtimeMs, size: st.size, binary: true };
+    return { mtime: st.mtimeMs, size: st.size, text: buf.toString('utf8') };
+  } catch (err) { return { error: String(err.message || err) }; }
+});
+
+ipcMain.handle('files:stat', async (_e, file) => {
+  try { return (await fs.promises.stat(file)).mtimeMs; } catch { return null; }
+});
+
+ipcMain.handle('files:write', async (_e, file, text) => {
+  try {
+    await fs.promises.writeFile(file, text, 'utf8');
+    return { mtime: (await fs.promises.stat(file)).mtimeMs };
+  } catch (err) { return { error: String(err.message || err) }; }
 });
 
 ipcMain.handle('projects:reveal', (_e, dir) => shell.openPath(dir));

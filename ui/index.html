@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:">
   <title>Deck</title>
   <link rel="stylesheet" href="../node_modules/@xterm/xterm/css/xterm.css">
   <link rel="stylesheet" href="style.css">
@@ -17,6 +17,10 @@
       </div>
       <input id="search" placeholder="Search or type a new name…" spellcheck="false">
       <ul id="projects"></ul>
+      <div id="files">
+        <div class="side-head"><span id="files-title">FILES</span><button id="quick-open-btn" title="Go to file… (Ctrl+P)">⌕</button></div>
+        <div id="filetree"></div>
+      </div>
     </aside>
     <section id="editor">
       <div id="tabbar">
@@ -38,11 +42,19 @@
             <tr><td>Ctrl+Shift+O</td><td>Open Folder (Windows picker)</td></tr>
             <tr><td>Ctrl+Shift+P</td><td>Search projects</td></tr>
             <tr><td>Ctrl+Shift+B</td><td>Show/hide projects</td></tr>
+            <tr><td>Ctrl+P</td><td>Go to file</td></tr>
+            <tr><td>Ctrl+S</td><td>Save the open file</td></tr>
             <tr><td>Ctrl+= / Ctrl+-</td><td>Font size</td></tr>
           </table>
         </div>
       </div>
     </section>
+  </div>
+  <div id="quickopen" hidden>
+    <div class="qo-box">
+      <input id="qo-input" placeholder="Go to file… (add :line to jump)" spellcheck="false">
+      <ul id="qo-list"></ul>
+    </div>
   </div>
   <script src="../node_modules/@xterm/xterm/lib/xterm.js"></script>
   <script src="../node_modules/@xterm/addon-fit/lib/addon-fit.js"></script>

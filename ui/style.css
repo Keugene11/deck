@@ -99,3 +99,54 @@ body.side-hidden #sidebar { display: none; }
 ::-webkit-scrollbar-thumb { background: rgba(121, 121, 121, .4); }
 ::-webkit-scrollbar-thumb:hover { background: rgba(100, 100, 100, .7); }
 ::-webkit-scrollbar-button { display: none; }
+
+/* ---------- files: tree, viewer/editor tabs, quick open ---------- */
+#projects { min-height: 90px; }
+#files { display: flex; flex-direction: column; height: 40%; min-height: 120px; border-top: 1px solid var(--border); }
+#files .side-head { flex: none; }
+#files .side-head button { font-size: 15px; }
+#filetree { flex: 1; overflow: auto; padding-bottom: 8px; }
+#filetree .node { display: flex; align-items: center; height: 22px; padding-right: 8px; cursor: pointer; white-space: nowrap; gap: 5px; }
+#filetree .node:hover { background: var(--hover); }
+#filetree .node.open-file { background: var(--selected); }
+#filetree .node .twist { width: 10px; flex: none; text-align: center; font-size: 9px; color: var(--fg-dim); }
+#filetree .node .nm { overflow: hidden; text-overflow: ellipsis; }
+#filetree .node.dir .nm { color: var(--fg); }
+#filetree .empty { padding: 4px 20px; color: var(--fg-dim); font-size: 12px; }
+
+.tab.file .kind { display: none; }
+.tab.file .label { font-family: "Segoe UI", system-ui, sans-serif; }
+.tab.file.dirty .label::after { content: ' ●'; color: var(--fg-dim); font-size: 10px; }
+
+.fileview { position: absolute; inset: 0; display: none; flex-direction: column; background: var(--bg); }
+.fileview.active { display: flex; }
+.fv-bar { flex: none; display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 10px; border-bottom: 1px solid var(--border);
+  background: var(--side); color: var(--fg-dim); font-size: 12px; }
+.fv-bar .fv-path { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; text-align: left; }
+.fv-bar button { padding: 2px 9px; border-radius: 4px; border: 1px solid #3c3c3c; font-size: 12px; }
+.fv-bar button:disabled { opacity: .4; cursor: default; background: none; color: var(--fg-dim); }
+.fv-note { flex: none; padding: 5px 12px; font-size: 12px; background: #3b2f12; color: #f0c674; display: none; align-items: center; gap: 10px; }
+.fv-note.show { display: flex; }
+.fv-note button { color: #f0c674; border: 1px solid #6b5a2a; border-radius: 4px; padding: 1px 8px; }
+.fv-body { flex: 1; min-height: 0; display: flex; position: relative; }
+.fv-gutter { flex: none; overflow: hidden; padding: 8px 10px 8px 12px; text-align: right; color: #5a5a5a; background: var(--bg);
+  font-family: "Cascadia Mono", Consolas, monospace; white-space: pre; user-select: none; border-right: 1px solid #262626; }
+.fv-text { flex: 1; min-width: 0; resize: none; border: 0; outline: none; background: var(--bg); color: var(--fg); padding: 8px 12px;
+  font-family: "Cascadia Mono", Consolas, "Courier New", monospace; white-space: pre; overflow: auto; tab-size: 2; user-select: text; }
+.fv-text::selection { background: #264f78; }
+.fv-msg { margin: auto; color: var(--fg-dim); text-align: center; }
+.fv-image { margin: auto; max-width: 92%; max-height: 92%; object-fit: contain; background: repeating-conic-gradient(#2a2a2a 0 25%, #222 0 50%) 0 0 / 16px 16px; }
+
+#quickopen { position: fixed; inset: 0; z-index: 50; display: flex; justify-content: center; align-items: flex-start; padding-top: 12vh; background: rgba(0,0,0,.35); }
+#quickopen[hidden] { display: none; }
+.qo-box { width: min(640px, 90vw); background: #252526; border: 1px solid #454545; border-radius: 6px; box-shadow: 0 8px 30px rgba(0,0,0,.5); overflow: hidden; }
+#qo-input { width: 100%; padding: 10px 12px; font: inherit; font-size: 14px; color: var(--fg); background: #313131; border: 0; border-bottom: 1px solid #3c3c3c; outline: none; }
+#qo-list { list-style: none; margin: 0; padding: 4px 0; max-height: 50vh; overflow-y: auto; }
+#qo-list li { display: flex; gap: 10px; align-items: baseline; padding: 4px 12px; cursor: pointer; white-space: nowrap; }
+#qo-list li.sel { background: var(--accent); color: #fff; }
+#qo-list li .base { flex: none; }
+#qo-list li .dir { color: var(--fg-dim); font-size: 12px; overflow: hidden; text-overflow: ellipsis; }
+#qo-list li.sel .dir { color: #d6e8f7; }
+#qo-list li mark { background: none; color: #4fc1ff; font-weight: 600; }
+#qo-list li.sel mark { color: #fff; text-decoration: underline; }
+#qo-list .none { padding: 8px 12px; color: var(--fg-dim); cursor: default; }

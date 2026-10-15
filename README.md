@@ -8,6 +8,7 @@ A desktop app for running many Claude Code sessions at once. Your projects are l
 - **Claude tabs on top**: clicking a project opens a tab running `claude --dangerously-skip-permissions` in that folder. Open as many as you want per project; the sidebar shows how many are open in each one.
 - **Built for running several at once**: every Claude tab is started with [parallel.md](parallel.md) appended to its system prompt, so sessions sharing a folder commit only their own files, type-check before pushing, and deploy from a clean checkout instead of shipping each other's half-finished edits.
 - **PowerShell tabs** sit beside them, for when you want a shell in the same folder.
+- **Open files without leaving Deck**: click any file path in terminal output (`src/lib/foo.ts:42` jumps to the line), press Ctrl+P to go to a file by fuzzy name (add `:line` to jump), or browse the file tree under the project list. Files open in their own tabs with line numbers and editing (Ctrl+S saves). A tab you haven't touched follows the disk, so it updates as Claude edits; if you have unsaved changes it warns instead. Images preview too.
 - Real terminals (xterm.js on node-pty), with truecolor, copy/paste, and adjustable font size.
 
 ## Shortcuts
@@ -21,6 +22,8 @@ A desktop app for running many Claude Code sessions at once. Your projects are l
 | Ctrl+1…9 | Go to tab |
 | Ctrl+Shift+O | Open Folder (Windows picker) |
 | Ctrl+Shift+P | Search projects |
+| Ctrl+P | Go to file (`name:line` jumps to a line) |
+| Ctrl+S | Save the open file tab |
 | Ctrl+Shift+B | Show/hide the project list |
 | Ctrl+= / Ctrl+- / Ctrl+0 | Font size up / down / reset |
 

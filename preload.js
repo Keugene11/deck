@@ -12,6 +12,12 @@ contextBridge.exposeInMainWorld('deck', {
   onData: fn => ipcRenderer.on('pty:data', (_e, id, data) => fn(id, data)),
   onClaudeEvent: fn => ipcRenderer.on('claude:event', (_e, id, event) => fn(id, event)),
   onExit: fn => ipcRenderer.on('pty:exit', (_e, id, code) => fn(id, code)),
+  listFiles: root => ipcRenderer.invoke('files:list', root),
+  listDir: dir => ipcRenderer.invoke('files:dir', dir),
+  resolveFile: (cwd, candidate) => ipcRenderer.invoke('files:resolve', cwd, candidate),
+  readFile: file => ipcRenderer.invoke('files:read', file),
+  statFile: file => ipcRenderer.invoke('files:stat', file),
+  writeFile: (file, text) => ipcRenderer.invoke('files:write', file, text),
   readClipboard: () => ipcRenderer.invoke('clip:read'),
   writeClipboard: text => ipcRenderer.send('clip:write', text),
 });
