@@ -177,8 +177,8 @@ function draggable(tabEl) {
       if (!dragging) {
         if (Math.abs(e.clientX - down.clientX) < 5) return;
         dragging = true;
-        tabEl.setPointerCapture(down.pointerId);
         tabEl.classList.add('dragging');
+        document.body.style.cursor = 'grabbing';
       }
       const r = bar.getBoundingClientRect();
       if (e.clientX < r.left + 30) bar.scrollLeft -= 12;
@@ -192,21 +192,24 @@ function draggable(tabEl) {
         break;
       }
     };
+    // Listen on window, not the tab: moving the tab in the DOM drops pointer capture,
+    // and a fast drag leaves the tab behind the cursor.
     const up = () => {
-      tabEl.removeEventListener('pointermove', move);
-      tabEl.removeEventListener('pointerup', up);
-      tabEl.removeEventListener('pointercancel', up);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
       if (!dragging) return;
       tabEl.classList.remove('dragging');
+      document.body.style.cursor = '';
       // The click that ends a drag shouldn't count as a click on the tab.
       tabEl.addEventListener('click', e => e.stopImmediatePropagation(), { capture: true, once: true });
       const order = [...bar.children];
       tabs.sort((a, b) => order.indexOf(a.tabEl) - order.indexOf(b.tabEl));
       saveSession();
     };
-    tabEl.addEventListener('pointermove', move);
-    tabEl.addEventListener('pointerup', up);
-    tabEl.addEventListener('pointercancel', up);
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
   });
 }
 
