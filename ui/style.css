@@ -78,6 +78,7 @@ body.side-hidden #sidebar { display: none; }
 .tab .close { width: 20px; height: 20px; border-radius: 4px; visibility: hidden; font-size: 14px; line-height: 1; }
 .tab.active .close, .tab:hover .close { visibility: visible; }
 .tab.exited .label { text-decoration: line-through; }
+.tab.dragging { opacity: 0.85; background: var(--tab-active); cursor: grabbing; z-index: 1; }
 #toggle-side { width: 40px; height: 35px; font-size: 15px; border-right: 1px solid var(--border); }
 #new-tab, #new-shell { width: 35px; height: 35px; font-size: 16px; }
 #new-shell { font-size: 12px; font-family: Consolas, monospace; }

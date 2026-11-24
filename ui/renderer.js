@@ -151,6 +151,7 @@ async function newTab(project, kind = 'claude', focus = true) {
   tabEl.onauxclick = e => { if (e.button === 1) closeTab(id); };
   tabEl.querySelector('.close').onclick = e => { e.stopPropagation(); closeTab(id); };
   $('#tabs').appendChild(tabEl);
+  draggable(tabEl);
 
   const tab = { id, project, kind, term, fit, el, tabEl, exited: false, state: 'idle' };
   tabs.push(tab);
@@ -163,6 +164,50 @@ async function newTab(project, kind = 'claude', focus = true) {
   await window.deck.spawn({ id, cwd: project.path, cols: term.cols, rows: term.rows, kind });
   saveSession();
   return tab;
+}
+
+// Drag a tab sideways to reorder it. `tabs` follows the new order, so Ctrl+Tab,
+// Ctrl+1…9 and the saved session match what you see.
+function draggable(tabEl) {
+  tabEl.addEventListener('pointerdown', down => {
+    if (down.button !== 0 || down.target.closest('.close')) return;
+    const bar = $('#tabs');
+    let dragging = false;
+    const move = e => {
+      if (!dragging) {
+        if (Math.abs(e.clientX - down.clientX) < 5) return;
+        dragging = true;
+        tabEl.setPointerCapture(down.pointerId);
+        tabEl.classList.add('dragging');
+      }
+      const r = bar.getBoundingClientRect();
+      if (e.clientX < r.left + 30) bar.scrollLeft -= 12;
+      else if (e.clientX > r.right - 30) bar.scrollLeft += 12;
+      for (const other of bar.children) {
+        if (other === tabEl) continue;
+        const b = other.getBoundingClientRect();
+        if (e.clientX < b.left || e.clientX > b.right) continue;
+        const after = e.clientX > b.left + b.width / 2;
+        bar.insertBefore(tabEl, after ? other.nextSibling : other);
+        break;
+      }
+    };
+    const up = () => {
+      tabEl.removeEventListener('pointermove', move);
+      tabEl.removeEventListener('pointerup', up);
+      tabEl.removeEventListener('pointercancel', up);
+      if (!dragging) return;
+      tabEl.classList.remove('dragging');
+      // The click that ends a drag shouldn't count as a click on the tab.
+      tabEl.addEventListener('click', e => e.stopImmediatePropagation(), { capture: true, once: true });
+      const order = [...bar.children];
+      tabs.sort((a, b) => order.indexOf(a.tabEl) - order.indexOf(b.tabEl));
+      saveSession();
+    };
+    tabEl.addEventListener('pointermove', move);
+    tabEl.addEventListener('pointerup', up);
+    tabEl.addEventListener('pointercancel', up);
+  });
 }
 
 function restart(t) {
@@ -334,6 +379,7 @@ async function newFileTab(project, file) {
   tabEl.onauxclick = e => { if (e.button === 1) closeTab(id); };
   tabEl.querySelector('.close').onclick = e => { e.stopPropagation(); closeTab(id); };
   $('#tabs').appendChild(tabEl);
+  draggable(tabEl);
 
   const t = { id, project, kind: 'file', filePath: file, el, tabEl, state: 'idle', dirty: false, saved: '', mtime: 0, ta: null };
   const note = el.querySelector('.fv-note');
